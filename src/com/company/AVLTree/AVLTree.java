@@ -36,6 +36,7 @@ public class AVLTree<T extends Comparable<T>> implements Tree<T> {
             }
         }
         updateHeight(node);
+        settleViolations(node);
     }
 
     @Override
@@ -76,6 +77,7 @@ public class AVLTree<T extends Comparable<T>> implements Tree<T> {
                 // remove the node and makes it eligible for Garbage Collector
                 node = null;
                 updateHeight(parent);
+                settleViolations(parent);
             }
             // CASE 2 only left child
             else if (node.getLeft() != null && node.getRight() == null) {
@@ -91,6 +93,7 @@ public class AVLTree<T extends Comparable<T>> implements Tree<T> {
                 }
                 node = null;
                 updateHeight(parent);
+                settleViolations(parent);
             }
             // CASE 3 only right
             else if (node.getRight() != null && node.getLeft() == null) {
@@ -107,6 +110,7 @@ public class AVLTree<T extends Comparable<T>> implements Tree<T> {
                 }
                 node = null;
                 updateHeight(parent);
+                settleViolations(parent);
             } else {
                 // CASE 4 two children
                 Node<T> predecessor = getPredecessor(node.getLeft());
@@ -118,6 +122,66 @@ public class AVLTree<T extends Comparable<T>> implements Tree<T> {
                 remove(data, predecessor);
             }
         }
+    }
+
+    private void rightRotation(Node<T> node) {
+        Node<T> temp_left = node.getLeft();
+        Node<T> grand_child = temp_left.getRight();
+        Node<T> temp_parent = node.getParent();
+
+        // handle parents
+        if (grand_child != null) {
+            grand_child.setParent(node);
+        }
+        node.setParent(temp_left);
+        temp_left.setParent(temp_parent);
+
+        // now we ready for rotation
+        temp_left.setRight(node);
+        node.setLeft(grand_child);
+
+        if (temp_left.getParent() == null) {
+            if (node == root) {
+                root = temp_left;
+            }
+        } else if (temp_parent.getLeft() == node) {
+            temp_left.getLeft().setLeft(temp_left);
+        } else {
+            temp_left.getRight().setRight(temp_left);
+        }
+
+        // after rotation the height might change
+        updateHeight(node);
+        updateHeight(temp_left);
+    }
+
+    private void leftRotation(Node<T> node) {
+        Node<T> temp_right = node.getRight();
+        Node<T> grand_child = temp_right.getLeft();
+        Node<T> temp_parent = node.getParent();
+
+        // the rotation
+        node.setLeft(temp_right);
+        node.setRight(grand_child);
+
+        //handle parents
+        node.setParent(temp_right);
+        temp_right.setParent(temp_parent);
+        if (grand_child != null) {
+            grand_child.setParent(node);
+        }
+
+        if (temp_parent == null) {
+            if (node == root) {
+                root = temp_parent;
+            }
+        } else if (temp_parent.getLeft() == node) {
+            temp_parent.setLeft(temp_right);
+        } else {
+            temp_parent.setRight(temp_right);
+        }
+        updateHeight(node);
+        updateHeight(temp_parent);
     }
 
     @Override
@@ -143,7 +207,7 @@ public class AVLTree<T extends Comparable<T>> implements Tree<T> {
     }
 
     private void updateHeight(Node<T> node) {
-        if(node == null) {
+        if (node == null) {
             return;
         }
         node.setHeight(Math.max(height(node.getLeft()), height(node.getRight())) + 1);
@@ -162,6 +226,36 @@ public class AVLTree<T extends Comparable<T>> implements Tree<T> {
             return 0;
         }
         return height(node.getLeft()) - height(node.getRight());
+    }
+
+    private void settleViolations(Node<T> node) {
+        // we must check up to the root node O(logN)
+        while (node != null) {
+            updateHeight(node);
+            violations(node);
+            node = node.getParent();
+        }
+    }
+
+    private void violations(Node<T> node) {
+        int balance = getBalance(node);
+        if (balance > 1) {
+
+            // CASE 1: left-right salutation
+            if (getBalance(node.getLeft()) < 1) {
+                leftRotation(node.getLeft());
+            }
+            // CASE 2: right rotation
+            rightRotation(node);
+        }
+        if (balance < -1) {
+            // CASE 3: right-left salutation
+            if (getBalance(node.getRight()) > 0) {
+                rightRotation(node.getRight());
+            }
+            // CASE 4: left rotation
+            leftRotation(node);
+        }
     }
 
 }

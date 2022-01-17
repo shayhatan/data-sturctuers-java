@@ -129,30 +129,33 @@ public class AVLTree<T extends Comparable<T>> implements Tree<T> {
         Node<T> grand_child = temp_left.getRight();
         Node<T> temp_parent = node.getParent();
 
+        // make rotation
+        temp_left.setRight(node);
+        node.setLeft(grand_child);
+
         // handle parents
         if (grand_child != null) {
             grand_child.setParent(node);
         }
+
         node.setParent(temp_left);
         temp_left.setParent(temp_parent);
 
-        // now we ready for rotation
-        temp_left.setRight(node);
-        node.setLeft(grand_child);
-
-        if (temp_left.getParent() == null) {
+        if (temp_parent == null) {
             if (node == root) {
                 root = temp_left;
             }
-        } else if (temp_parent.getLeft() == node) {
-            temp_left.getLeft().setLeft(temp_left);
         } else {
-            temp_left.getRight().setRight(temp_left);
+            if (temp_parent.getLeft() == node) {
+                temp_parent.setLeft(temp_left);
+            } else {
+                temp_parent.setRight(temp_left);
+            }
         }
 
-        // after rotation the height might change
+        // update height
         updateHeight(node);
-        updateHeight(temp_left);
+        updateHeight(temp_parent);
     }
 
     private void leftRotation(Node<T> node) {
@@ -160,28 +163,31 @@ public class AVLTree<T extends Comparable<T>> implements Tree<T> {
         Node<T> grand_child = temp_right.getLeft();
         Node<T> temp_parent = node.getParent();
 
-        // the rotation
-        //  node.setRight(temp_parent);
-        node.setLeft(temp_right);
-        // temp_parent.setLeft(temp_right);
+        // make rotation
+        temp_right.setLeft(node);
         node.setRight(grand_child);
 
-        //handle parents
-        node.setParent(temp_right);
-        temp_right.setParent(temp_parent);
+        // handle parents
         if (grand_child != null) {
             grand_child.setParent(node);
         }
 
+        node.setParent(temp_right);
+        temp_right.setParent(temp_parent);
+
         if (temp_parent == null) {
             if (node == root) {
-                root = temp_parent;
+                root = temp_right;
             }
-        } else if (temp_parent.getLeft() == node) {
-            temp_parent.setLeft(temp_right);
         } else {
-            temp_parent.setRight(temp_right);
+            if (temp_parent.getLeft() == node) {
+                temp_parent.setLeft(temp_right);
+            } else {
+                temp_parent.setRight(temp_right);
+            }
         }
+
+        // update height
         updateHeight(node);
         updateHeight(temp_parent);
     }

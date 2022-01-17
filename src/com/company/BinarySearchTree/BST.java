@@ -47,7 +47,7 @@ public class BST<T extends Comparable<T>> implements Tree<T> {
         if (node.getData().compareTo(data) < 0) {
             remove(data, node.getRight());
         } else if (node.getData().compareTo(data) > 0) {
-            remove(data, node);
+            remove(data, node.getLeft());
         } else {
             // we have found the node
             // CASE 1 no children at all

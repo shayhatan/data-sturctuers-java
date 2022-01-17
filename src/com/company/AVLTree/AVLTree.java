@@ -59,7 +59,7 @@ public class AVLTree<T extends Comparable<T>> implements Tree<T> {
         if (node.getData().compareTo(data) < 0) {
             remove(data, node.getRight());
         } else if (node.getData().compareTo(data) > 0) {
-            remove(data, node);
+            remove(data, node.getLeft());
         } else {
             // we have found the node
             // CASE 1 no children at all
@@ -161,7 +161,9 @@ public class AVLTree<T extends Comparable<T>> implements Tree<T> {
         Node<T> temp_parent = node.getParent();
 
         // the rotation
+        //  node.setRight(temp_parent);
         node.setLeft(temp_right);
+        // temp_parent.setLeft(temp_right);
         node.setRight(grand_child);
 
         //handle parents
@@ -242,7 +244,7 @@ public class AVLTree<T extends Comparable<T>> implements Tree<T> {
         if (balance > 1) {
 
             // CASE 1: left-right salutation
-            if (getBalance(node.getLeft()) < 1) {
+            if (getBalance(node.getLeft()) < 0) {
                 leftRotation(node.getLeft());
             }
             // CASE 2: right rotation

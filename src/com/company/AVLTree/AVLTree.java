@@ -1,8 +1,6 @@
 package com.company.AVLTree;
 
 
-import com.company.ArrayQuestions.PalindromeProblem;
-
 public class AVLTree<T extends Comparable<T>> implements Tree<T> {
 
     private Node<T> root;

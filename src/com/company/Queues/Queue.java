@@ -1,48 +1,51 @@
 package com.company.Queues;
 
 public class Queue<T extends Comparable<T>> {
+
     private Node<T> head;
     private Node<T> tail;
-    int count;
+    private int count;
 
-    public boolean isEmpty() {
-        return head == null;
+    public boolean isEmpty(){
+        return this.head == null;
     }
 
-    public int size() {
-        return count;
+    public int size(){
+        return this.count;
     }
 
     // O(1)
-    public void enqueue(T newData) {
+    public void enqueue(T new_data){
 
-        Node<T> newNode = new Node<>(newData);
-        if (isEmpty()) {
-            head = newNode;
-        } else {
-            if(tail == null) {
-                tail = newNode;
-                head.setNextNode(tail);
-            }
-            else {
-                Node<T> temp = tail;
-                tail = newNode;
-                newNode = temp;
-                newNode.setNextNode(tail);
-            }
+        Node<T> old_last_node = this.tail;
+        this.tail = new Node<>(new_data);
+        this.tail.setNextNode(null);
+
+        if( isEmpty() ){
+            this.head = this.tail;
+        }else{
+            old_last_node.setNextNode(this.tail);
         }
-        ++count;
+
+        count++;
+
     }
 
+    // O(1)
     public T dequeue() {
-        if(count == 0) {
-            return null;
+
+        // could throw exception  if(count == null)
+        this.count--;
+
+        T to_dequeue = this.head.getData();
+        this.head =this.head.getNextNode();
+
+        if( isEmpty() ){
+            this.tail = null;
         }
 
-        T to_remove = head.getData();
-        head = head.getNextNode();
-        --count;
-        return to_remove;
+        return to_dequeue;
     }
 }
+
 
